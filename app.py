@@ -13,10 +13,10 @@ app = Flask(__name__)
 port = env['APP_PORT']
 host = env['APP_HOST']
 api_version = env['API_VERSION']
-url_subpath = env['URL_SUBPATH']
+#url_subpath = env['URL_SUBPATH']
 koha_api_public_test = env["KOHA_API_PUBLIC_TEST"]
 
-class ReverseProxied(object):
+"""class ReverseProxied(object):
     #Class to dynamically adapt Flask converted url of static files (/sttaic/js...) + templates html href links according to the url app path after the hostname (set in cnfig.py)
     def __init__(self, app, script_name=None, scheme=None, server=None):
         self.app = app
@@ -37,11 +37,11 @@ class ReverseProxied(object):
         server = environ.get('HTTP_X_FORWARDED_SERVER', '') or self.server
         if server:
             environ['HTTP_HOST'] = server
-        return self.app(environ, start_response)
+        return self.app(environ, start_response)"""
 
 FlaskJSON(app)
-api = Api(app, title='SCD-UCA Middleware Koha-Primo', api_version='1.0', api_spec_url='/api/swagger', base_path=f'{host}:{port}{url_subpath}')
-app.wsgi_app = ReverseProxied(app.wsgi_app, script_name=url_subpath)
+api = Api(app, title='SCD-UCA Middleware Koha-Primo', api_version='1.0', api_spec_url='/api/swagger', base_path=f'{host}:{port}')
+#app.wsgi_app = ReverseProxied(app.wsgi_app, script_name=url_subpath)
 
 @api.representation('application/json')
 def output_json(data, code):
@@ -55,14 +55,14 @@ class HelloWorld(Resource):
 class KohaApiPubliqueItems(Resource):
     @swagger.doc({
     })
-    def get(self, id):
-        url = f"{koha_api_public_test}biblios/{id}/items"
+    def get(self, biblio_id):
+        url = f"{koha_api_public_test}biblios/{biblio_id}/items"
         response = requests.request("GET", url).text
         data = json.loads(response)        
         return jsonify(data)
 
 api.add_resource(HelloWorld, f'/api/{api_version}', f'/api/{api_version}/hello')      
-api.add_resource(KohaApiPubliqueItems, f'/api/{api_version}/koha_items/<string:id>')
+api.add_resource(KohaApiPubliqueItems, f'/api/{api_version}/koha_items/<string:biblio_id>')
 
 if __name__ == '__main__':
     app.run(debug=True,port=port,host=host)

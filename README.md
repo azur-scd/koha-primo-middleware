@@ -29,7 +29,7 @@ docker build -t azurscd/koha-primo-middleware:latest .
 docker run -d --name koha-primo-middleware -p 5002:5000 -v <your_local_path>/koha-primo-middleware:/app azurscd/koha-primo-middleware:latest
 
 ```
-Tourne en local sur http://localhost:5002/koha-primo-middleware
+Tourne en local sur http://localhost:5002/koha-primo-middleware (ex : [http://localhost:5002/koha-primo-middleware/api/v1/hello](http://localhost:5002/koha-primo-middleware/api/v1/hello))
 
 ### CI/CD
 

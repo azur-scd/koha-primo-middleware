@@ -37,9 +37,9 @@ Chaque commit/push sur Github déclenche une Github Action qui rebuild et push l
 
 ## Prod
 
-Dépôt Docker Hub : 
+Dépôt Docker Hub : [https://hub.docker.com/repository/docker/azurscd/koha-primo-middleware](https://hub.docker.com/repository/docker/azurscd/koha-primo-middleware)
 
-Déployé en prod sur dev-scd.unice.fr ()
+Déployé en prod sur dev-scd.unice.fr (ex : [http://dev-scd.unice.fr/koha-primo-middleware/api/v1/hello](http://dev-scd.unice.fr/koha-primo-middleware/api/v1/hello))
 
 ## Documentation
 

@@ -2,6 +2,7 @@ from flask import Flask, jsonify, abort, render_template,url_for,request,session
 from flask_restful import Resource, reqparse
 from flask_restful_swagger_2 import Api, swagger, Schema
 from flask_json import FlaskJSON, json_response
+from flask_cors import CORS
 import pandas as pd
 import requests
 import json
@@ -10,6 +11,8 @@ from dotenv import dotenv_values
 env = dotenv_values(".env")
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 port = env['APP_PORT']
 host = env['APP_HOST']
 api_version = env['API_VERSION']

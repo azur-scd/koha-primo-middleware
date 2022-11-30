@@ -7,6 +7,7 @@ import pandas as pd
 import requests
 import json
 from dotenv import dotenv_values
+import config
 
 env = dotenv_values(".env")
 
@@ -17,7 +18,10 @@ port = env['APP_PORT']
 host = env['APP_HOST']
 api_version = env['API_VERSION']
 url_subpath = env['URL_SUBPATH']
-koha_api_public_test = env["KOHA_API_PUBLIC_TEST"]
+demo_koha_api_public = env["DEMO_KOHA_API_PUBLIC"]
+preprod_koha_api_public = env["PREPROD_KOHA_API_PUBLIC"]
+mapping_bibs = config.MAPPING_BIBS
+mapping_codes_types_pret = config.MAPPING_CODES_TYPES_PRET
 
 class ReverseProxied(object):
     #Class to dynamically adapt Flask converted url of static files (/sttaic/js...) + templates html href links according to the url app path after the hostname (set in cnfig.py)
@@ -46,6 +50,21 @@ FlaskJSON(app)
 api = Api(app, title='SCD-UCA Middleware Koha-Primo', api_version='1.0', api_spec_url='/api/swagger', base_path=f'{host}:{port}')
 app.wsgi_app = ReverseProxied(app.wsgi_app, script_name=url_subpath)
 
+def extract_koha_item(item):
+    result = {}
+    if (item['checked_out_date'] is None) & (item["holding_library_id"] == item["home_library_id"]):
+        result['checked_out_date'] = 'Disponible'
+    elif (item['checked_out_date'] is None) & (item["holding_library_id"] != item["home_library_id"]):
+        result['checked_out_date'] = 'Indisponible : en transfert'
+    #elif item['checked_out_date'] is not None:
+    else:
+        result['checked_out_date'] = 'Indisponible : emprunté'
+    result["item_type_id"] = mapping_codes_types_pret[item["item_type_id"]]
+    result["home_library_id"] = mapping_bibs[item["home_library_id"]]
+    result["location"] = item["location"]
+    result["callnumber"] = item["callnumber"]
+    return result
+
 @api.representation('application/json')
 def output_json(data, code):
     return json_response(data_=data, status_=code)
@@ -55,17 +74,18 @@ class HelloWorld(Resource):
         # Default to 200 OK
         return jsonify({'msg': 'Hello world'})
 
-class KohaApiPubliqueItems(Resource):
+class KohaApiPubliqueBibliosItems(Resource):
     @swagger.doc({
     })
     def get(self, biblio_id):
-        url = f"{koha_api_public_test}biblios/{biblio_id}/items"
+        url = f"{preprod_koha_api_public}biblios/{biblio_id}/items"
         response = requests.request("GET", url).text
-        data = json.loads(response)        
-        return jsonify(data)
+        data = json.loads(response)
+        new_data = [extract_koha_item(i) for i in data]        
+        return jsonify(new_data)
 
 api.add_resource(HelloWorld, f'/api/{api_version}', f'/api/{api_version}/hello')      
-api.add_resource(KohaApiPubliqueItems, f'/api/{api_version}/koha_items/<string:biblio_id>')
+api.add_resource(KohaApiPubliqueBibliosItems, f'/api/{api_version}/koha/biblios_items/<string:biblio_id>')
 
 if __name__ == '__main__':
     app.run(debug=True,port=port,host=host)

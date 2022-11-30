@@ -1,4 +1,4 @@
-# Middleware APIs Koha
+# Environnement de développement Primo-Koha : Middleware APIs Koha
 
 ![forthebadge](forthebadge.svg)
 
@@ -25,6 +25,7 @@ Container à déployer sur un serveur jouant le rôle de serveur mandataire entr
 ### En local
 
 ```
+git clone https://github.com/azur-scd/koha-primo-middleware.git
 docker build -t azurscd/koha-primo-middleware:latest .
 docker run -d --name koha-primo-middleware -p 5002:5000 -v <your_local_path>/koha-primo-middleware:/app azurscd/koha-primo-middleware:latest
 
@@ -39,7 +40,7 @@ Chaque commit/push sur Github déclenche une Github Action qui rebuild et push l
 
 Dépôt Docker Hub : [https://hub.docker.com/repository/docker/azurscd/koha-primo-middleware](https://hub.docker.com/repository/docker/azurscd/koha-primo-middleware)
 
-Déployé en prod sur dev-scd.unice.fr (ex : [http://dev-scd.unice.fr/koha-primo-middleware/api/v1/hello](http://dev-scd.unice.fr/koha-primo-middleware/api/v1/hello))
+Déployé en prod-test sur dev-scd.unice.fr (ex : [http://dev-scd.unice.fr/koha-primo-middleware/api/v1/hello](http://dev-scd.unice.fr/koha-primo-middleware/api/v1/hello)
 
 ## Documentation
 

@@ -59,10 +59,15 @@ def extract_koha_item(item):
     #elif item['checked_out_date'] is not None:
     else:
         result['checked_out_date'] = 'Indisponible : emprunté'
-    result["item_type_id"] = mapping_codes_types_pret[item["item_type_id"]]
     result["home_library_id"] = mapping_bibs[item["home_library_id"]]
     result["location"] = item["location"]
     result["callnumber"] = item["callnumber"]
+    if item["external_id"].startswith('HDL'):
+        result["serial_issue_number"] = f"Etat de collection : {item['serial_issue_number']}" # si pério on affiche l' état de coll
+    else:
+        if item["serial_issue_number"] is not None:
+            result["serial_issue_number"] =  item["serial_issue_number"] # si pas pério et si champ non vide on affiche la description
+        result["item_type_id"] = mapping_codes_types_pret[item["item_type_id"]] # si pas pério on affiche la régle de prêt
     return result
 
 @api.representation('application/json')

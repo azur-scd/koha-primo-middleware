@@ -13,6 +13,10 @@ __pycache__
 .log
 sonar-project.properties
 
+# Ignore ssl stuffs #
+###################
+/ssl
+
 # Ignore local windows batch files #
 ###################
 *.bat

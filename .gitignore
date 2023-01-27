@@ -15,7 +15,7 @@ sonar-project.properties
 
 # Ignore ssl stuffs #
 ###################
-/ssl
+ssl
 
 # Ignore local windows batch files #
 ###################

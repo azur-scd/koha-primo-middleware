@@ -7,6 +7,7 @@ import pandas as pd
 import requests
 import json
 from dotenv import dotenv_values
+import mappings
 import config
 
 env = dotenv_values(".env")
@@ -20,8 +21,11 @@ api_version = env['API_VERSION']
 url_subpath = env['URL_SUBPATH']
 demo_koha_api_public = env["DEMO_KOHA_API_PUBLIC"]
 preprod_koha_api_public = env["PREPROD_KOHA_API_PUBLIC"]
-mapping_bibs = config.MAPPING_BIBS
-mapping_codes_types_pret = config.MAPPING_CODES_TYPES_PRET
+mapping_codes_types_pret = mappings.MAPPING_CODES_TYPES_PRET
+mapping_bibs = mappings.MAPPING_BIBS
+mapping_locs = mappings.MAPPING_LOCS
+bibs_order = config.BIBS_ORDER
+bibs_order_by_label = config.BIBS_ORDER_BY_LABEL
 
 class ReverseProxied(object):
     #Class to dynamically adapt Flask converted url of static files (/sttaic/js...) + templates html href links according to the url app path after the hostname (set in cnfig.py)
@@ -52,22 +56,30 @@ app.wsgi_app = ReverseProxied(app.wsgi_app, script_name=url_subpath)
 
 def extract_koha_item(item):
     result = {}
+    # s'il n'y a pas de date de retour et si le doc n'est pas en transfert -> disponible
     if (item['checked_out_date'] is None) & (item["holding_library_id"] == item["home_library_id"]):
-        result['checked_out_date'] = 'Disponible'
+        result['availability'] = 'Disponible'
+    # s'il n'y a pas de date de retour et si le doc est en transfert -> indisponible
     elif (item['checked_out_date'] is None) & (item["holding_library_id"] != item["home_library_id"]):
-        result['checked_out_date'] = 'Indisponible : en transfert'
+        result['availability'] = 'Indisponible : en transit'
+    # sinon (ie s'il y a une date de retour) -> indisponible
     #elif item['checked_out_date'] is not None:
     else:
-        result['checked_out_date'] = 'Indisponible : emprunté'
+        checked_out_date = item['checked_out_date']
+        result['availability'] = f'Indisponible : emprunté (Retour le {checked_out_date})'
     result["home_library_id"] = mapping_bibs[item["home_library_id"]]
-    result["location"] = item["location"]
+    result["location"] = mapping_locs[item["location"]]
     result["callnumber"] = item["callnumber"]
+    # si pério on affiche l' état de coll
     if item["external_id"].startswith('HDL'):
-        result["serial_issue_number"] = f"Etat de collection : {item['serial_issue_number']}" # si pério on affiche l' état de coll
+        result["serial_issue_number"] = f"Etat de collection : {item['serial_issue_number']}"
+    # si pas pério
     else:
+        # si champ non vide -> le champ contient une description -> display
         if item["serial_issue_number"] is not None:
-            result["serial_issue_number"] =  item["serial_issue_number"] # si pas pério et si champ non vide on affiche la description
-        result["item_type_id"] = mapping_codes_types_pret[item["item_type_id"]] # si pas pério on affiche la régle de prêt
+            result["serial_issue_number"] =  item["serial_issue_number"]
+        # si pas pério on affiche la régle de prêt
+        result["loan_type"] = mapping_codes_types_pret[item["item_type_id"]]
     return result
 
 @api.representation('application/json')
@@ -80,13 +92,17 @@ class HelloWorld(Resource):
         return jsonify({'msg': 'Hello world'})
 
 class KohaApiPubliqueBibliosItems(Resource):
+
     @swagger.doc({
     })
+
     def get(self, biblio_id):
         url = f"{preprod_koha_api_public}biblios/{biblio_id}/items"
         response = requests.request("GET", url).text
         data = json.loads(response)
-        new_data = [extract_koha_item(i) for i in data]        
+        ordered_data = sorted(data, key=lambda x: bibs_order[x.get('home_library_id')])
+        # Pour inverser : sorted(data, key=lambda x: bibs_order[x.get('home_library_id')], reverse=True)
+        new_data = [extract_koha_item(i) for i in ordered_data]       
         return jsonify(new_data)
 
 api.add_resource(HelloWorld, f'/api/{api_version}', f'/api/{api_version}/hello')      
@@ -94,3 +110,6 @@ api.add_resource(KohaApiPubliqueBibliosItems, f'/api/{api_version}/koha/biblios_
 
 if __name__ == '__main__':
     app.run(debug=True,port=port,host=host)
+
+    ## Doc pour recevoir des args du type url/biblios_items/25894/?record_type=book
+    # https://github.com/marshmallow-code/webargs/blob/dev/examples/flaskrestful_example.py

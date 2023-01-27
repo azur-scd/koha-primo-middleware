@@ -12,3 +12,7 @@ __pycache__
 .scannerwork
 .log
 sonar-project.properties
+
+# Ignore local windows batch files #
+###################
+*.bat

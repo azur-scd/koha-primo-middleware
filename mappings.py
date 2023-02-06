@@ -1,8 +1,8 @@
 ####### DICTIONNAIRES DE MAPPING POUR LES DONNEES CODEES KOHA ###################
 #################################################################################
 
-MAPPING_CODES_TYPES_PRET = {'NOR': 'Prêt normal - 14 jours',
-                            'COU': 'Prêt court - 5 jours',
+MAPPING_CODES_TYPES_PRET = {'NOR': 'Prêt normal',
+                            'COU': 'Prêt court',
                             'SP': 'Consultable sur place',
                             'RDV': 'Consultable sur place sur rendez-vous',
                             'NC': 'Non consultable',

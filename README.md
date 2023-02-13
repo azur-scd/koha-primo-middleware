@@ -17,7 +17,7 @@ Container à déployer sur un serveur jouant le rôle de serveur mandataire entr
 
 - /api/v1 : Hello World
 - /api/v1/hello : Hello World
-- /api/v1/koha_items/{biblio_id} : exemplaires d'une notice bib identifiée par son biblio_id
+- /api/v1/koha/biblios_items/{biblio_id} : exemplaires d'une notice bib identifiée par son biblio_id
 
 
 ## Dev : Build & déploiement
@@ -30,7 +30,7 @@ docker build -t azurscd/koha-primo-middleware:latest .
 docker run -d --name koha-primo-middleware -p 50020:5000 -v <your_local_path>/koha-primo-middleware:/app azurscd/koha-primo-middleware:latest
 
 ```
-Tourne en local sur http://localhost:5000/koha-primo-middleware (ex : [http://localhost:5000/koha-primo-middleware/api/v1/hello](http://localhost:5000/api/v1/hello))
+Tourne en local sur https://localhost:5000/koha-primo-middleware (ex : [https://localhost:5000/koha-primo-middleware/api/v1/hello](https://localhost:5000/api/v1/hello))
 
 ### CI/CD
 

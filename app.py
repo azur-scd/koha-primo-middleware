@@ -27,8 +27,9 @@ mapping_locs = mappings.MAPPING_LOCS
 bibs_order = config.BIBS_ORDER
 bibs_order_by_label = config.BIBS_ORDER_BY_LABEL
 
+# It dynamically adapts Flask converted url of static files (/sttaic/js...) + templates html href
+# links according to the url app path after the hostname (set in cnfig.py)
 class ReverseProxied(object):
-    #Class to dynamically adapt Flask converted url of static files (/sttaic/js...) + templates html href links according to the url app path after the hostname (set in cnfig.py)
     def __init__(self, app, script_name=None, scheme=None, server=None):
         self.app = app
         self.script_name = script_name
@@ -70,16 +71,12 @@ def extract_koha_item(item):
     result["home_library_id"] = mapping_bibs[item["home_library_id"]]
     result["location"] = mapping_locs[item["location"]]
     result["callnumber"] = item["callnumber"]
-    # si pério on affiche l' état de coll
+    result["loan_type"] = mapping_codes_types_pret[item["item_type_id"]]
+    # si pério on affiche l' état de coll et la règle deprêt
     if item["external_id"].startswith('HDL'):
         result["serial_issue_number"] = f"Etat de collection : {item['serial_issue_number']}"
-    # si pas pério
-    else:
-        # si champ non vide -> le champ contient une description -> display
-        if item["serial_issue_number"] is not None:
-            result["serial_issue_number"] =  item["serial_issue_number"]
-        # si pas pério on affiche la régle de prêt
-        result["loan_type"] = mapping_codes_types_pret[item["item_type_id"]]
+    elif item["serial_issue_number"] is not None:
+        result["serial_issue_number"] =  item["serial_issue_number"]
     return result
 
 @api.representation('application/json')
@@ -91,6 +88,7 @@ class HelloWorld(Resource):
         # Default to 200 OK
         return jsonify({'msg': 'Hello world'})
 
+# It takes a biblio_id as input, and returns a list of items associated with that biblio_id
 class KohaApiPubliqueBibliosItems(Resource):
 
     @swagger.doc({

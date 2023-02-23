@@ -20,7 +20,7 @@ host = env['APP_HOST']
 api_version = env['API_VERSION']
 url_subpath = env['URL_SUBPATH']
 demo_koha_api_public = env["DEMO_KOHA_API_PUBLIC"]
-preprod_koha_api_public = env["PREPROD_KOHA_API_PUBLIC"]
+prod_koha_api_public = env["PROD_KOHA_API_PUBLIC"]
 mapping_codes_types_pret = mappings.MAPPING_CODES_TYPES_PRET
 mapping_bibs = mappings.MAPPING_BIBS
 mapping_locs = mappings.MAPPING_LOCS
@@ -95,7 +95,7 @@ class KohaApiPubliqueBibliosItems(Resource):
     })
 
     def get(self, biblio_id):
-        url = f"{preprod_koha_api_public}biblios/{biblio_id}/items"
+        url = f"{prod_koha_api_public}biblios/{biblio_id}/items"
         response = requests.request("GET", url).text
         data = json.loads(response)
         ordered_data = sorted(data, key=lambda x: bibs_order[x.get('home_library_id')])

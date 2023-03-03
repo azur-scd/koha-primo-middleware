@@ -12,12 +12,14 @@ Container à déployer sur un serveur jouant le rôle de serveur mandataire entr
 ## Cas d'usage
 
 - APIs publiques : header Access-Control-Allow-Origin vide par défaut dans Koha
-
+- APIs privées : gestion d'Oauth2 et gestion du token déportée côté serveur
+- 
 ## Routing API Koha
 
 - /api/v1 : Hello World
 - /api/v1/hello : Hello World
 - /api/v1/koha/biblios_items/{biblio_id} : exemplaires d'une notice bib identifiée par son biblio_id
+- /api/v1/koha/items/external_id/{cb} : données d'exemplaires par requête sur le CB
 
 
 ## Dev : Build & déploiement
@@ -32,7 +34,7 @@ docker run -d --name koha-primo-middleware -p 5002:5000 -v <your_local_path>/koh
 ```
 Tourne en local sur https://localhost:5000/koha-primo-middleware (ex : [https://localhost:5000/koha-primo-middleware/api/v1/hello](https://localhost:5000/api/v1/hello))
 
-### CI/CD
+### [désactivé cause .env] CI/CD
 
 Chaque commit/push sur Github déclenche une Github Action qui rebuild et push l'image sur Docker Hub.
 

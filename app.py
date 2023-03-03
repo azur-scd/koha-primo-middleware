@@ -9,6 +9,7 @@ import json
 from dotenv import dotenv_values
 import mappings
 import config
+import sys
 
 env = dotenv_values(".env")
 
@@ -21,6 +22,11 @@ api_version = env['API_VERSION']
 url_subpath = env['URL_SUBPATH']
 demo_koha_api_public = env["DEMO_KOHA_API_PUBLIC"]
 prod_koha_api_public = env["PROD_KOHA_API_PUBLIC"]
+prod_koha_api_auth = env["PROD_KOHA_API_AUTH"]
+prod_koha_api_prive = env["PROD_KOHA_API_PRIVE"]
+api_koha_client_id = env["API_KOHA_CLIENT_ID"]
+api_koha_client_secret = env["API_KOHA_CLIENT_SECRET"]
+
 mapping_codes_types_pret = mappings.MAPPING_CODES_TYPES_PRET
 mapping_bibs = mappings.MAPPING_BIBS
 mapping_locs = mappings.MAPPING_LOCS
@@ -86,6 +92,29 @@ def extract_koha_item(item):
         result["serial_issue_number"] =  item["serial_issue_number"]
     return result
 
+def get_access_token(url, client_id, client_secret):
+    response = requests.post(
+        url,
+        data={"grant_type": "client_credentials"},
+        auth=(client_id, client_secret),
+    )
+    return response.json()["access_token"]
+
+token = get_access_token(prod_koha_api_auth, api_koha_client_id, api_koha_client_secret)
+
+def get_callnumber_by_cb(cb,token):
+    url = f"{prod_koha_api_prive}/items"
+    headers = {'Authorization': f'Bearer {token}',
+                   'Accept': 'application/json'}
+    payload = {"external_id":f'{cb}'}
+    response = requests.request("GET", url, headers=headers, data=payload)
+    if response.status_code == 200:
+        data = json.loads(response.text)
+        return extract_koha_item(data[0])
+    else:
+        token = get_access_token(prod_koha_api_auth, api_koha_client_id, api_koha_client_secret) 
+        get_callnumber_by_cb(cb,token)
+
 @api.representation('application/json')
 def output_json(data, code):
     return json_response(data_=data, status_=code)
@@ -109,9 +138,15 @@ class KohaApiPubliqueBibliosItems(Resource):
         # Pour inverser : sorted(data, key=lambda x: bibs_order[x.get('home_library_id')], reverse=True)
         new_data = [extract_koha_item(i) for i in ordered_data]       
         return jsonify(new_data)
+    
+class KohaApiPriveItems(Resource):
+    def get(self, cb):
+        data = get_callnumber_by_cb(cb,token)
+        return jsonify(data)
 
 api.add_resource(HelloWorld, f'/api/{api_version}', f'/api/{api_version}/hello')      
 api.add_resource(KohaApiPubliqueBibliosItems, f'/api/{api_version}/koha/biblios_items/<string:biblio_id>')
+api.add_resource(KohaApiPriveItems, f'/api/{api_version}/koha/items/external_id/<string:cb>')
 
 if __name__ == '__main__':
     app.run(debug=True,port=port,host=host)

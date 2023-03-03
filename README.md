@@ -26,8 +26,8 @@ Container à déployer sur un serveur jouant le rôle de serveur mandataire entr
 
 ```
 git clone https://github.com/azur-scd/koha-primo-middleware.git
-docker build -t azurscd/koha-primo-middleware:latest .
-docker run -d --name koha-primo-middleware -p 50020:5000 -v <your_local_path>/koha-primo-middleware:/app azurscd/koha-primo-middleware:latest
+docker build -t azurscd/koha-primo-middleware:dev .
+docker run -d --name koha-primo-middleware -p 5002:5000 -v <your_local_path>/koha-primo-middleware:/app azurscd/koha-primo-middleware:dev
 
 ```
 Tourne en local sur https://localhost:5000/koha-primo-middleware (ex : [https://localhost:5000/koha-primo-middleware/api/v1/hello](https://localhost:5000/api/v1/hello))

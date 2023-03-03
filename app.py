@@ -68,11 +68,18 @@ def extract_koha_item(item):
     else:
         checked_out_date = item['checked_out_date']
         result['availability'] = f'Indisponible : emprunté (Retour le {checked_out_date})'
+    # Bibliothèque
     result["home_library_id"] = mapping_bibs[item["home_library_id"]]
-    result["location"] = mapping_locs[item["location"]]
-    result["callnumber"] = item["callnumber"]
-    result["loan_type"] = mapping_codes_types_pret[item["item_type_id"]]
-    # si pério on affiche l' état de coll et la règle deprêt
+    # Localisation
+    if item["location"] is not None:
+        result["location"] = mapping_locs[item["location"]]
+    # Cote
+    if item["callnumber"] is not None:
+        result["callnumber"] = item["callnumber"]
+    # Type de prêt
+    if item["item_type_id"] is not None:
+        result["loan_type"] = mapping_codes_types_pret[item["item_type_id"]]
+    # si pério on affiche l' état de coll ; si monographie on affiche la description
     if item["external_id"].startswith('HDL'):
         result["serial_issue_number"] = f"Etat de collection : {item['serial_issue_number']}"
     elif item["serial_issue_number"] is not None:

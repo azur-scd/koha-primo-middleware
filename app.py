@@ -38,8 +38,9 @@ bibs_order_by_label = config.BIBS_ORDER_BY_LABEL
 # Set the locale to French
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
 
-# It dynamically adapts Flask converted url of static files (/sttaic/js...) + templates html href
-# links according to the url app path after the hostname (set in cnfig.py)
+# The ReverseProxied class is a middleware for a WSGI application that handles reverse proxy headers.
+# It dynamically adapts Flask converted url of static files (/static/js...) + templates html href
+# links according to the url app path after the hostname (set in .env)
 class ReverseProxied(object):
     def __init__(self, app, script_name=None, scheme=None, server=None):
         self.app = app
@@ -130,6 +131,8 @@ def get_callnumber_by_cb(cb,token):
 def output_json(data, code):
     return json_response(data_=data, status_=code)
 
+# The class "HelloWorld" is a resource that returns a JSON response with the message "Hello world"
+# when a GET request is made.
 class HelloWorld(Resource):
     def get(self):
         # Default to 200 OK
@@ -137,10 +140,8 @@ class HelloWorld(Resource):
 
 # It takes a biblio_id as input, and returns a list of items associated with that biblio_id
 class KohaApiPubliqueBibliosItems(Resource):
-
     @swagger.doc({
     })
-
     def get(self, biblio_id):
         url = f"{prod_koha_api_public}biblios/{biblio_id}/items"
         response = requests.request("GET", url).text
@@ -150,6 +151,8 @@ class KohaApiPubliqueBibliosItems(Resource):
         new_data = [extract_koha_item(i) for i in ordered_data]       
         return jsonify(new_data)
     
+# This is a class that defines a GET method for retrieving data related to a specific call number from
+# a Koha API using a given token.
 class KohaApiPriveItems(Resource):
     def get(self, cb):
         data = get_callnumber_by_cb(cb,token)

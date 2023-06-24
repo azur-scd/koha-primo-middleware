@@ -55,10 +55,14 @@ Une fois les développements stabilisés dans le conteneur local :
 
 ### A noter CI/CD via Github Action désactivé
 
-
 ## Todo
 
 Doc Swagger
+
+## Derniers updates
+
+
+- [x] Due date en format français
 
 
 

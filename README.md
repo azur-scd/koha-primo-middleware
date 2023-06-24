@@ -13,7 +13,7 @@ Container à déployer sur un serveur jouant le rôle de serveur mandataire entr
 
 - APIs publiques : header Access-Control-Allow-Origin vide par défaut dans Koha
 - APIs privées : gestion d'Oauth2 et gestion du token déportée côté serveur
-- 
+  
 ## Routing API Koha
 
 - /api/v1 : Hello World
@@ -29,7 +29,7 @@ Container à déployer sur un serveur jouant le rôle de serveur mandataire entr
 ```
 git clone https://github.com/azur-scd/koha-primo-middleware.git
 docker build -t azurscd/koha-primo-middleware:dev .
-docker run -d --name koha-primo-middleware -p 5002:5000 -v <your_local_path>/koha-primo-middleware:/app azurscd/koha-primo-middleware:dev
+docker run -d --name koha-primo-middleware -p 5000:5000 -v <your_local_path>/koha-primo-middleware:/app azurscd/koha-primo-middleware:dev
 
 ```
 Tourne en local sur https://localhost:5000/koha-primo-middleware (ex : [https://localhost:5000/koha-primo-middleware/api/v1/hello](https://localhost:5000/api/v1/hello))

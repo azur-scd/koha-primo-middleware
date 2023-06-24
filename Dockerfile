@@ -1,5 +1,10 @@
 # syntax=docker/dockerfile:1
 FROM python:3.10.8-slim-buster
+RUN apt-get update \ 
+    && apt-get install -y locales locales-all
+ENV LC_ALL fr_FR.UTF-8
+ENV LANG fr_FR.UTF-8
+ENV LANGUAGE fr_FR.UTF-8
 WORKDIR /app
 COPY requirements.txt requirements.txt
 RUN pip install --upgrade pip

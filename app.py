@@ -6,6 +6,8 @@ from flask_cors import CORS
 import pandas as pd
 import requests
 import json
+import datetime
+import locale
 from dotenv import dotenv_values
 import mappings
 import config
@@ -33,6 +35,9 @@ mapping_locs = mappings.MAPPING_LOCS
 bibs_order = config.BIBS_ORDER
 bibs_order_by_label = config.BIBS_ORDER_BY_LABEL
 
+# Set the locale to French
+locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+
 # It dynamically adapts Flask converted url of static files (/sttaic/js...) + templates html href
 # links according to the url app path after the hostname (set in cnfig.py)
 class ReverseProxied(object):
@@ -43,23 +48,28 @@ class ReverseProxied(object):
         self.server = server
 
     def __call__(self, environ, start_response):
-        script_name = environ.get('HTTP_X_SCRIPT_NAME', '') or self.script_name
-        if script_name:
+        if (
+            script_name := environ.get('HTTP_X_SCRIPT_NAME', '')
+            or self.script_name
+        ):
             environ['SCRIPT_NAME'] = script_name
             path_info = environ['PATH_INFO']
             if path_info.startswith(script_name):
                 environ['PATH_INFO'] = path_info[len(script_name):]
-        scheme = environ.get('HTTP_X_SCHEME', '') or self.scheme
-        if scheme:
+        if scheme := environ.get('HTTP_X_SCHEME', '') or self.scheme:
             environ['wsgi.url_scheme'] = scheme
-        server = environ.get('HTTP_X_FORWARDED_SERVER', '') or self.server
-        if server:
+        if server := environ.get('HTTP_X_FORWARDED_SERVER', '') or self.server:
             environ['HTTP_HOST'] = server
         return self.app(environ, start_response)
 
 FlaskJSON(app)
 api = Api(app, title='SCD-UCA Middleware Koha-Primo', api_version='1.0', api_spec_url='/api/swagger', base_path=f'{host}:{port}')
 app.wsgi_app = ReverseProxied(app.wsgi_app, script_name=url_subpath)
+
+def convert_to_french_date(date_string):
+    # Convert the date string to a datetime object
+    date = datetime.datetime.strptime(date_string, '%Y-%m-%d')
+    return date.strftime('%d %B %Y')
 
 def extract_koha_item(item):
     result = {}
@@ -72,7 +82,7 @@ def extract_koha_item(item):
     # sinon (ie s'il y a une date de retour) -> indisponible
     #elif item['checked_out_date'] is not None:
     else:
-        checked_out_date = item['checked_out_date']
+        checked_out_date = convert_to_french_date(item['checked_out_date'])
         result['availability'] = f'Indisponible : emprunté (Retour le {checked_out_date})'
     # Bibliothèque
     result["home_library_id"] = mapping_bibs[item["home_library_id"]]
@@ -110,6 +120,7 @@ def get_callnumber_by_cb(cb,token):
     response = requests.request("GET", url, headers=headers, data=payload)
     if response.status_code == 200:
         data = json.loads(response.text)
+        print(data)
         return extract_koha_item(data[0])
     else:
         token = get_access_token(prod_koha_api_auth, api_koha_client_id, api_koha_client_secret) 

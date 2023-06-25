@@ -26,13 +26,28 @@ Container à déployer sur un serveur jouant le rôle de serveur mandataire entr
 
 ### Container local
 
+Le dépôt contient 2 Dockerfiles : un pour builder l'image d'un container qui se lancera en https, et l'autre en http (indifférent en local)
+
+**Pour développer dans le container en https :**
+
 ```
 git clone https://github.com/azur-scd/koha-primo-middleware.git
-docker build -t azurscd/koha-primo-middleware:dev .
-docker run -d --name koha-primo-middleware -p 5000:5000 -v <your_local_path>/koha-primo-middleware:/app azurscd/koha-primo-middleware:dev
+docker build -t -f Dockerfile_https azurscd/koha-primo-middleware:latest .
+docker run -d --name koha-primo-middleware -p 5000:5000 -v <your_local_path>/koha-primo-middleware:/app azurscd/koha-primo-middleware:latest
 
 ```
 Tourne en local sur https://localhost:5000/koha-primo-middleware (ex : [https://localhost:5000/koha-primo-middleware/api/v1/hello](https://localhost:5000/api/v1/hello))
+
+**Pour développer dans le container en http :**
+
+```
+git clone https://github.com/azur-scd/koha-primo-middleware.git
+docker build -t -f Dockerfile_http azurscd/koha-primo-middleware:dev-http
+docker run -d --name koha-primo-middleware -p 5000:5000 -v <your_local_path>/koha-primo-middleware:/app azurscd/koha-primo-middleware:dev-http
+
+```
+Tourne en local sur http://localhost:5000/koha-primo-middleware (ex : [http://localhost:5000/koha-primo-middleware/api/v1/hello](http://localhost:5000/api/v1/hello))
+
 
 ### Intégration locale avec [https://github.com/azur-scd/koha-primo-explore-devenv](https://github.com/azur-scd/koha-primo-explore-devenv)
 
@@ -48,9 +63,8 @@ Dans le dossier du projet koha-primo-explore-devenv, ouvrir /primo-explore/custo
 
 Une fois les développements stabilisés dans le conteneur local :
 
-- ne pas oublier de rebuilder l'image
+- ne pas oublier de rebuilder l'image (commande : docker build -t -f Dockerfile_https azurscd/koha-primo-middleware:latest .) 
 - pusher sur le dépôt Docker Hub [https://hub.docker.com/repository/docker/azurscd/koha-primo-middleware](https://hub.docker.com/repository/docker/azurscd/koha-primo-middleware)
-- déployer en dev sur dev-scd.unice.fr ([http://dev-scd.unice.fr/koha-primo-middleware/api/v1/hello](http://dev-scd.unice.fr/koha-primo-middleware/api/v1/hello) par un pull de Docker Hub
 - déployer sur le serveur de production par un pull de Docker Hub
 
 ### A noter CI/CD via Github Action désactivé

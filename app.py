@@ -21,6 +21,7 @@ cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 port = env['APP_PORT']
 host = env['APP_HOST']
 api_version = env['API_VERSION']
+api_version_dev = env['API_VERSION_DEV']
 url_subpath = env['URL_SUBPATH']
 demo_koha_api_public = env["DEMO_KOHA_API_PUBLIC"]
 prod_koha_api_public = env["PROD_KOHA_API_PUBLIC"]
@@ -34,6 +35,9 @@ mapping_bibs = mappings.MAPPING_BIBS
 mapping_locs = mappings.MAPPING_LOCS
 bibs_order = config.BIBS_ORDER
 bibs_order_by_label = config.BIBS_ORDER_BY_LABEL
+resanavette_bibs_true = config.RESANAVETTE_BIBS_TRUE
+resa_bibs_true = config.RESA_BIBS_TRUE
+resa_codes_pret_true = config.RESA_CODES_PRET_TRUE
 
 # Set the locale to French
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
@@ -67,10 +71,33 @@ FlaskJSON(app)
 api = Api(app, title='SCD-UCA Middleware Koha-Primo', api_version='1.0', api_spec_url='/api/swagger', base_path=f'{host}:{port}')
 app.wsgi_app = ReverseProxied(app.wsgi_app, script_name=url_subpath)
 
+@api.representation('application/json')
+def output_json(data, code):
+    return json_response(data_=data, status_=code)
+
+################ HELPERS FUNCTIONS ######################
+#########################################################
+
 def convert_to_french_date(date_string):
     # Convert the date string to a datetime object
     date = datetime.datetime.strptime(date_string, '%Y-%m-%d')
     return date.strftime('%d %B %Y')
+
+def resa_button_rules(items):
+    libraries = [x.get('home_library_id') for x in items]
+    codes_pret = [x.get('item_type_id') for x in items]
+    if any(x in libraries for x in resanavette_bibs_true) & any(
+        x in codes_pret for x in resa_codes_pret_true
+    ):
+        return "Réservation/Navette interBU"
+    elif (
+        all(x not in libraries for x in resanavette_bibs_true)
+        & any(x in libraries for x in resa_bibs_true)
+        & any(x in codes_pret for x in resa_codes_pret_true)
+    ):
+        return "Réservation"
+    else:
+        return "no button"
 
 def extract_koha_item(item):
     result = {}
@@ -127,9 +154,8 @@ def get_callnumber_by_cb(cb,token):
         token = get_access_token(prod_koha_api_auth, api_koha_client_id, api_koha_client_secret) 
         get_callnumber_by_cb(cb,token)
 
-@api.representation('application/json')
-def output_json(data, code):
-    return json_response(data_=data, status_=code)
+################### API CLASSES ############################
+############################################################
 
 # The class "HelloWorld" is a resource that returns a JSON response with the message "Hello world"
 # when a GET request is made.
@@ -138,7 +164,7 @@ class HelloWorld(Resource):
         # Default to 200 OK
         return jsonify({'msg': 'Hello world'})
 
-# It takes a biblio_id as input, and returns a list of items associated with that biblio_id
+# It takes a biblio_id as input, and returns a list of converted items associated with that biblio_id
 class KohaApiPubliqueBibliosItems(Resource):
     @swagger.doc({
     })
@@ -151,6 +177,20 @@ class KohaApiPubliqueBibliosItems(Resource):
         new_data = [extract_koha_item(i) for i in ordered_data]       
         return jsonify(new_data)
     
+# It takes a biblio_id as input, and returns a list of converted items associated with that biblio_id + the calculated value of the resarvation button to display (or not)
+class DevKohaApiPubliqueBibliosItems(Resource):
+    @swagger.doc({
+    })
+    def get(self, biblio_id):
+        url = f"{prod_koha_api_public}biblios/{biblio_id}/items"
+        response = requests.request("GET", url).text
+        data = json.loads(response)
+        ordered_data = sorted(data, key=lambda x: bibs_order[x.get('home_library_id')])
+        new_data = [extract_koha_item(i) for i in ordered_data]
+        resa_button = resa_button_rules(data)
+        final_data = {"resa_button": resa_button, "items": new_data}
+        return jsonify(final_data)
+    
 # This is a class that defines a GET method for retrieving data related to a specific call number from
 # a Koha API using a given token.
 class KohaApiPriveItems(Resource):
@@ -160,6 +200,7 @@ class KohaApiPriveItems(Resource):
 
 api.add_resource(HelloWorld, f'/api/{api_version}', f'/api/{api_version}/hello')      
 api.add_resource(KohaApiPubliqueBibliosItems, f'/api/{api_version}/koha/biblios_items/<string:biblio_id>')
+api.add_resource(DevKohaApiPubliqueBibliosItems, f'/api/{api_version_dev}/koha/biblios_items/<string:biblio_id>')
 api.add_resource(KohaApiPriveItems, f'/api/{api_version}/koha/items/external_id/<string:cb>')
 
 if __name__ == '__main__':

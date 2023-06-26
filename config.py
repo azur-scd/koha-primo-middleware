@@ -1,5 +1,5 @@
 ####### BIBS ORDERED FOR DISPLAYING KOHA ITEMS ###################
-#################################################################################
+##################################################################
 
 BIBS_ORDER = {'LASH': 1,
                 'DROIT': 2,
@@ -39,3 +39,10 @@ BIBS_ORDER_BY_LABEL = {"BU Lettres Arts Sciences Humaines": 1,
                 "CMMC": 17,
                 "BCL": 18
                 }
+
+####### RULES FOR DISPLAYING RESERVATION BUTTON ###################
+##################################################################
+
+RESANAVETTE_BIBS_TRUE = ['SCIEN','MEDP','LASH', 'DROIT','SJA', 'STAPS', 'LCSOPHIA', 'BIUTF']
+RESA_BIBS_TRUE = ['LJAD', 'BIUTC', 'BIUTM']
+RESA_CODES_PRET_TRUE = ['NOR', 'COU']

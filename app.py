@@ -100,7 +100,7 @@ def resa_button_rules(items):
         return "no button"
 
 def extract_koha_item(item):
-    result = {}
+    result = {'biblio_id': item['biblio_id']}
     # s'il n'y a pas de date de retour et si le doc n'est pas en transfert -> disponible
     if (item['checked_out_date'] is None) & (item["holding_library_id"] == item["home_library_id"]):
         result['availability'] = 'Disponible'
@@ -130,29 +130,15 @@ def extract_koha_item(item):
         result["serial_issue_number"] =  item["serial_issue_number"]
     return result
 
-def get_access_token(url, client_id, client_secret):
-    response = requests.post(
-        url,
-        data={"grant_type": "client_credentials"},
-        auth=(client_id, client_secret),
-    )
-    return response.json()["access_token"]
+def request_on_koha_api(biblio_id):
+    url = f"{prod_koha_api_public}biblios/{biblio_id}/items"
+    response = requests.request("GET", url).text
+    data = json.loads(response)
+    return [x for x in data if x["home_library_id"] != "BIBEL"]
 
-token = get_access_token(prod_koha_api_auth, api_koha_client_id, api_koha_client_secret)
+def flatten(l):
+    return [item for sublist in l for item in sublist]
 
-def get_callnumber_by_cb(cb,token):
-    url = f"{prod_koha_api_prive}/items"
-    headers = {'Authorization': f'Bearer {token}',
-                   'Accept': 'application/json'}
-    payload = {"external_id":f'{cb}'}
-    response = requests.request("GET", url, headers=headers, data=payload)
-    if response.status_code == 200:
-        data = json.loads(response.text)
-        print(data)
-        return extract_koha_item(data[0])
-    else:
-        token = get_access_token(prod_koha_api_auth, api_koha_client_id, api_koha_client_secret) 
-        get_callnumber_by_cb(cb,token)
 
 ################### API CLASSES ############################
 ############################################################
@@ -181,27 +167,18 @@ class KohaApiPubliqueBibliosItems(Resource):
 class DevKohaApiPubliqueBibliosItems(Resource):
     @swagger.doc({
     })
-    def get(self, biblio_id):
-        url = f"{prod_koha_api_public}biblios/{biblio_id}/items"
-        response = requests.request("GET", url).text
-        data = json.loads(response)
-        ordered_data = sorted(data, key=lambda x: bibs_order[x.get('home_library_id')])
+    def get(self):
+        biblio_ids = request.args.get("biblio_ids")
+        datas = flatten([request_on_koha_api(id) for id in biblio_ids.split(",") if request_on_koha_api(id)])    
+        ordered_data = sorted(datas, key=lambda x: bibs_order[x.get('home_library_id')])
         new_data = [extract_koha_item(i) for i in ordered_data]
-        resa_button = resa_button_rules(data)
+        resa_button = resa_button_rules(datas)
         final_data = {"resa_button": resa_button, "items": new_data}
         return jsonify(final_data)
-    
-# This is a class that defines a GET method for retrieving data related to a specific call number from
-# a Koha API using a given token.
-class KohaApiPriveItems(Resource):
-    def get(self, cb):
-        data = get_callnumber_by_cb(cb,token)
-        return jsonify(data)
 
 api.add_resource(HelloWorld, f'/api/{api_version}', f'/api/{api_version}/hello')      
 api.add_resource(KohaApiPubliqueBibliosItems, f'/api/{api_version}/koha/biblios_items/<string:biblio_id>')
-api.add_resource(DevKohaApiPubliqueBibliosItems, f'/api/{api_version_dev}/koha/biblios_items/<string:biblio_id>')
-api.add_resource(KohaApiPriveItems, f'/api/{api_version}/koha/items/external_id/<string:cb>')
+api.add_resource(DevKohaApiPubliqueBibliosItems, f'/api/{api_version_dev}/koha/biblios_items')
 
 if __name__ == '__main__':
     app.run(debug=True,port=port,host=host)

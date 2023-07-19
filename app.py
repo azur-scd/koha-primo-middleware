@@ -27,8 +27,6 @@ demo_koha_api_public = env["DEMO_KOHA_API_PUBLIC"]
 prod_koha_api_public = env["PROD_KOHA_API_PUBLIC"]
 prod_koha_api_auth = env["PROD_KOHA_API_AUTH"]
 prod_koha_api_prive = env["PROD_KOHA_API_PRIVE"]
-api_koha_client_id = env["API_KOHA_CLIENT_ID"]
-api_koha_client_secret = env["API_KOHA_CLIENT_SECRET"]
 
 mapping_codes_types_pret = mappings.MAPPING_CODES_TYPES_PRET
 mapping_bibs = mappings.MAPPING_BIBS
@@ -149,9 +147,9 @@ class HelloWorld(Resource):
     def get(self):
         # Default to 200 OK
         return jsonify({'msg': 'Hello world'})
-
+    
 # It takes a biblio_id as input, and returns a list of converted items associated with that biblio_id
-class KohaApiPubliqueBibliosItems(Resource):
+class InitKohaApiPubliqueBibliosItems(Resource):
     @swagger.doc({
     })
     def get(self, biblio_id):
@@ -162,8 +160,21 @@ class KohaApiPubliqueBibliosItems(Resource):
         # Pour inverser : sorted(data, key=lambda x: bibs_order[x.get('home_library_id')], reverse=True)
         new_data = [extract_koha_item(i) for i in ordered_data]       
         return jsonify(new_data)
+
+# It takes a biblio_id as input, and returns a list of converted items associated with that biblio_id
+class KohaApiPubliqueBibliosItems(Resource):
+    @swagger.doc({
+    })
+    def get(self):
+        biblio_ids = request.args.get("biblio_ids")
+        datas = flatten([request_on_koha_api(id) for id in biblio_ids.split(",") if request_on_koha_api(id)])    
+        ordered_data = sorted(datas, key=lambda x: bibs_order[x.get('home_library_id')])
+        new_data = [extract_koha_item(i) for i in ordered_data]
+        resa_button = resa_button_rules(datas)
+        final_data = {"resa_button": resa_button, "items": new_data}
+        return jsonify(final_data)
     
-# It takes a biblio_id as input, and returns a list of converted items associated with that biblio_id + the calculated value of the resarvation button to display (or not)
+# It takes one biblio_id or a string of biblio_ids separated with comma as input, and returns a list of converted items associated with that biblio_id + the calculated value of the resarvation button to display (or not)
 class DevKohaApiPubliqueBibliosItems(Resource):
     @swagger.doc({
     })
@@ -176,12 +187,11 @@ class DevKohaApiPubliqueBibliosItems(Resource):
         final_data = {"resa_button": resa_button, "items": new_data}
         return jsonify(final_data)
 
+
 api.add_resource(HelloWorld, f'/api/{api_version}', f'/api/{api_version}/hello')      
-api.add_resource(KohaApiPubliqueBibliosItems, f'/api/{api_version}/koha/biblios_items/<string:biblio_id>')
-api.add_resource(DevKohaApiPubliqueBibliosItems, f'/api/{api_version_dev}/koha/biblios_items')
+#api.add_resource(InitKohaApiPubliqueBibliosItems, f'/api/{api_version}/koha/biblios_items/<string:biblio_id>')
+api.add_resource(KohaApiPubliqueBibliosItems, f'/api/{api_version}/koha/biblios_items')
+#api.add_resource(DevKohaApiPubliqueBibliosItems, f'/api/{api_version_dev}/koha/biblios_items')
 
 if __name__ == '__main__':
     app.run(debug=True,port=port,host=host)
-
-    ## Doc pour recevoir des args du type url/biblios_items/25894/?record_type=book
-    # https://github.com/marshmallow-code/webargs/blob/dev/examples/flaskrestful_example.py

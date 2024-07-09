@@ -12,7 +12,7 @@ gunicorn==20.1.0
 idna==3.4
 importlib-metadata==5.0.0
 itsdangerous==2.1.2
-Jinja2==3.1.2
+Jinja2==3.1.4
 MarkupSafe==2.1.1
 numpy==1.23.4
 pandas==1.5.1

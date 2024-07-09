@@ -1,0 +1,2 @@
+2024-07-09 : mise à jour de la version de Python et des dépendances
+2024-07-08 : ajout de la localisation DET2 (BU Droit)

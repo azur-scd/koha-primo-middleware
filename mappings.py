@@ -9,7 +9,8 @@ MAPPING_CODES_TYPES_PRET = {'NOR': 'Prêt normal',
                             'PCCOU': 'PC prêt 1j',
                             'PCLONG': 'PC prêt long',
                             'PCPRO': 'PC prêt professionnel',
-                            'EL': 'En ligne'}
+                            'EL': 'En ligne',
+                            'JEU' : 'Jeu de société'}
 MAPPING_BIBS = {"LASH": "BU Lettres Arts Sciences Humaines",
                 "DROIT": "BU Droit et Science politique",
                 "SJA": "BU Saint-Jean d’Angély",

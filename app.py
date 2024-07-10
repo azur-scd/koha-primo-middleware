@@ -98,6 +98,30 @@ def resa_button_rules(items):
         return "no button"
 
 def extract_koha_item(item):
+    # TODO vérifier le fonctionnement de checked out date
+    # TODO revoir la détection des périodiques (ne plus s'appuyer sur HDL dans le code barre)
+    # Exemple de réponse de la route publique de l'API Koha biblios/{biblio_id}/items (version 21.11 ; à vérifier en 23.11)
+    # [{"acquisition_date":"2009-11-04",
+    # "biblio_id":402754,               => biblionumber. Utilisé
+    # "callnumber":"330.155 6 SEN",     => cote. Utilisé
+    # "checked_out_date":null,          => date de prêt. Utilisé
+    # "copy_number":null,
+    # "damaged_status":0,
+    # "effective_item_type_id":"NOR",
+    # "effective_not_for_loan_status":0,
+    # "external_id":"0962065252",        => code-barre. Utilisé
+    # "holding_library_id":"SJA",        => bibliothèque effective (<> bibliothèque d'appartenance en cas de transfert). Utilisé
+    # "home_library_id":"SJA",           => bibliothèque d'appartenance. Utilisé
+    # "item_id":731974,
+    # "item_type_id":"NOR",              => type de prêt. Utilisé
+    # "location":"ECO",                  => localisation. Utilisé
+    # "lost_status":0,
+    # "not_for_loan_status":0,
+    # "public_notes":null,
+    # "restricted_status":null,
+    # "serial_issue_number":null,        => flag périoduiques. Utilisé
+    # "uri":null,
+    # "withdrawn":0}]
     result = {'biblio_id': item['biblio_id']}
     # s'il n'y a pas de date de retour et si le doc n'est pas en transfert -> disponible
     if (item['checked_out_date'] is None) & (item["holding_library_id"] == item["home_library_id"]):

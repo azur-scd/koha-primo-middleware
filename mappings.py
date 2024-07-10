@@ -28,7 +28,8 @@ MAPPING_BIBS = {"LASH": "BU Lettres Arts Sciences Humaines",
                 "JAD": "Bibliothèque du LJAD",
                 "LIRCE": "Bibliothèque du LIRCES",
                 "CMMC": "Bibliothèque du CMMC",
-                "BCL": "Bibliothèque du BCL"}
+                "BCL": "Bibliothèque du BCL",
+                "BIBEL" : "Bibliothèque électronique"}
 MAPPING_LOCS = {"A213E": "Salle A213 - Enseignement-Vulgarisation",
 "A213G": "Salle A213 - Guides-Dico",
 "A213I": "Salle A213 - Informatique",

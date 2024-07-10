@@ -119,7 +119,7 @@ def extract_koha_item(item):
     # "not_for_loan_status":0,
     # "public_notes":null,
     # "restricted_status":null,
-    # "serial_issue_number":null,        => flag périoduiques. Utilisé
+    # "serial_issue_number":null,        => description. Utilisé
     # "uri":null,
     # "withdrawn":0}]
     result = {'biblio_id': item['biblio_id']}

@@ -40,6 +40,7 @@ resa_codes_pret_true = config.RESA_CODES_PRET_TRUE
 # Set the locale to French
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
 
+# Voir https://stackoverflow.com/questions/30743696/create-proxy-for-python-flask-application
 # The ReverseProxied class is a middleware for a WSGI application that handles reverse proxy headers.
 # It dynamically adapts Flask converted url of static files (/static/js...) + templates html href
 # links according to the url app path after the hostname (set in .env)
@@ -116,7 +117,7 @@ def extract_koha_item(item):
     # "item_type_id":"NOR",              => type de prêt. Utilisé
     # "location":"ECO",                  => localisation. Utilisé
     # "lost_status":0,
-    # "not_for_loan_status":0,
+    # "not_for_loan_status":0,           => statut exclu du prêt. Utilisé pour repérer les états de collection
     # "public_notes":null,
     # "restricted_status":null,
     # "serial_issue_number":null,        => description. Utilisé
@@ -146,7 +147,7 @@ def extract_koha_item(item):
     if item["item_type_id"] is not None:
         result["loan_type"] = mapping_codes_types_pret[item["item_type_id"]]
     # si pério on affiche l' état de coll ; si monographie on affiche la description
-    if item["external_id"].startswith('HDL'):
+    if item["not_for_loan_status"] = "2":
         result["serial_issue_number"] = f"Etat de collection : {item['serial_issue_number']}"
     elif item["serial_issue_number"] is not None:
         result["serial_issue_number"] =  item["serial_issue_number"]

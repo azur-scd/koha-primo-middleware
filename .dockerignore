@@ -1,0 +1,9 @@
+.git
+.github
+**/*venv*/**
+*.ipynb_checkpoints
+__pycache__
+.scannerwork
+.log
+sonar-project.properties
+*.bat

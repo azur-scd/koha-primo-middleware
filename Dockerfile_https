@@ -12,4 +12,4 @@ RUN pip install -r requirements.txt
 COPY . .
 VOLUME ["/app"]
 EXPOSE 5000
-CMD [ "gunicorn", "--certfile=ssl/localhost.crt", "--keyfile=ssl/localhost.key", "--bind=0.0.0.0:5000", "wsgi:app"]
+CMD [ "gunicorn", "--certfile=ssl/localhost.crt", "--keyfile=ssl/localhost.key", "--bind=0.0.0.0:5000", "--log-level=trace", "--access-logfile=-", "wsgi:app"]

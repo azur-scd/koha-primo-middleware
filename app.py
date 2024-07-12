@@ -12,10 +12,24 @@ from dotenv import dotenv_values
 import mappings
 import config
 import sys
+import logging
+
 
 env = dotenv_values(".env")
 
+#logging.basicConfig(filename='debug.log', level=logging.DEBUG)
+#logging.basicConfig(filename='record.log', level=logging.INFO)
+
+
 app = Flask(__name__)
+
+if __name__ != '__main__':
+   gunicorn_logger = logging.getLogger('gunicorn.error')
+   app.logger.handlers = gunicorn_logger.handlers
+   app.logger.setLevel(gunicorn_logger.level)
+# voir https://trstringer.com/logging-flask-gunicorn-the-manageable-way/
+
+
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 port = env['APP_PORT']
@@ -147,16 +161,26 @@ def extract_koha_item(item):
     if item["item_type_id"] is not None:
         result["loan_type"] = mapping_codes_types_pret[item["item_type_id"]]
     # si pério on affiche l' état de coll ; si monographie on affiche la description
-    if item["not_for_loan_status"] = "2":
-        result["serial_issue_number"] = f"Etat de collection : {item['serial_issue_number']}"
+    if (item["serial_issue_number"] is not None) & (item["not_for_loan_status"] == 2) :
+        result["serial_issue_number"] = f"Etat de collection : {item['serial_issue_number']}"        
     elif item["serial_issue_number"] is not None:
-        result["serial_issue_number"] =  item["serial_issue_number"]
+        result["serial_issue_number"] =  item["serial_issue_number"]        
     return result
 
 def request_on_koha_api(biblio_id):
+    if (biblio_id is None) or not (biblio_id.isnumeric ()): 
+            app.logger.warn("API Koha biblios/biblio_id/items non appellée, parametre invalide")
+            return []       
+    app.logger.info("API Koha biblios/biblio_id/items appellée avec parametre {}".format (biblio_id))
     url = f"{prod_koha_api_public}biblios/{biblio_id}/items"
-    response = requests.request("GET", url).text
-    data = json.loads(response)
+    response = requests.request("GET", url)
+    if response.status_code != 200:
+            app.logger.warn("Erreur : l'API a renvoyé le code {}".format(response.status_code))
+            return []
+    data = json.loads(response.text)
+    if hasattr(data, "error") :
+            app.logger.warn("Erreur : Notice pas trouvée par l'API Koha biblios/biblio_id/items")
+            return []
     return [x for x in data if x["home_library_id"] != "BIBEL"]
 
 def flatten(l):
@@ -190,9 +214,15 @@ class InitKohaApiPubliqueBibliosItems(Resource):
 class KohaApiPubliqueBibliosItems(Resource):
     @swagger.doc({
     })
-    def get(self):
+    def get(self):        
         biblio_ids = request.args.get("biblio_ids")
-        datas = flatten([request_on_koha_api(id) for id in biblio_ids.split(",") if request_on_koha_api(id)])    
+        if (biblio_ids is None) or (biblio_ids == "" )  :
+            app.logger.warn("Erreur : pas d'arguments")
+            return jsonify ({"Erreur":"pas d'arguments"})
+        valid_ids_list = [id for id in biblio_ids.split(",") if id.isnumeric ()]
+# est-ce qu'on appelle pas 2 fois l'api koha?        
+        datas = flatten([request_on_koha_api(id) for id in valid_ids_list])    
+        app.logger.info("API middleware appellée avec parametres {}".format (valid_ids_list))
         ordered_data = sorted(datas, key=lambda x: bibs_order[x.get('home_library_id')])
         new_data = [extract_koha_item(i) for i in ordered_data]
         resa_button = resa_button_rules(datas)
@@ -219,4 +249,5 @@ api.add_resource(KohaApiPubliqueBibliosItems, f'/api/{api_version}/koha/biblios_
 #api.add_resource(DevKohaApiPubliqueBibliosItems, f'/api/{api_version_dev}/koha/biblios_items')
 
 if __name__ == '__main__':
+# debug=True pour les tests en local si application appelée par python app.py
     app.run(debug=True,port=port,host=host)

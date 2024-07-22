@@ -54,10 +54,15 @@ resa_codes_pret_true = config.RESA_CODES_PRET_TRUE
 # Set the locale to French
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
 
-# Voir https://stackoverflow.com/questions/30743696/create-proxy-for-python-flask-application
+# FIXME Il y a sans doute moyen de faire plus simple
+# cette classe sert à s'assurer que les fichiers statiques Flask (js, css, html) soient bien servis par des urls avec le subpath /koha-primo-middleware/ et non vers /
 # The ReverseProxied class is a middleware for a WSGI application that handles reverse proxy headers.
 # It dynamically adapts Flask converted url of static files (/static/js...) + templates html href
 # links according to the url app path after the hostname (set in .env)
+# Voir https://stackoverflow.com/questions/30743696/create-proxy-for-python-flask-application
+# Voir aussi https://trysten.github.io/2020/11/25/flask_behind_apache_reverseproxy.html ; https://dlukes.github.io/flask-wsgi-url-prefix.html ; https://www.it-connect.fr/mise-en-place-dun-reverse-proxy-apache-avec-mod_proxy/
+# Transmet à Gunicorn des variables d'environnements : SCRIPT_NAME, PATH_INFO, wsgi.url_scheme, HTTP_HOST
+# SCRIPT_NAME vaudra URL_SUBPATH défini dans le .env (ex: "/koha-primo-middleware")
 class ReverseProxied(object):
     def __init__(self, app, script_name=None, scheme=None, server=None):
         self.app = app

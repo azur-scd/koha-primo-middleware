@@ -13,4 +13,4 @@ RUN pip install -r requirements.txt
 COPY . .
 VOLUME ["/app"]
 EXPOSE 5000
-CMD [ "gunicorn", "--bind=0.0.0.0:5000", "wsgi:app", "--log-level=trace", "--access-logfile=-"]
+CMD [ "gunicorn", "--bind=0.0.0.0:5000", "wsgi:app", "--log-level=warn", "--access-logfile=-"]

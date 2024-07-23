@@ -8,3 +8,4 @@ __pycache__
 .log
 sonar-project.properties
 *.bat
+secrets.env

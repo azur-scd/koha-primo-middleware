@@ -20,3 +20,4 @@ sonar-project.properties
 # Ignore env file #
 ###################
 .env
+secrets.env

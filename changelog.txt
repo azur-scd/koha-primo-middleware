@@ -1,3 +1,4 @@
+2024-07-23 : image réduite, meilleure sécurité, clés Koha importées depuis fichier sur serveur hôte, ajout de localisations BGG et DET3
 2024-07-12 : meilleure gestion des erreurs et journalisation
 2024-07-10 : mise à jour des dépendances, ajout de la localisation CONC (BU Droit), du type de prêt JEU, de la bib BIBEL
 2024-07-09 : mise à jour de la version de Python et des dépendances

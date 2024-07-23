@@ -63,9 +63,16 @@ Dans le dossier du projet koha-primo-explore-devenv, ouvrir /primo-explore/custo
 
 Une fois les développements stabilisés dans le conteneur local :
 
+- fichier secrets.env à créer sur le serveur de production à la racine du dossier home de l'utilisateur avec 2 variables : API_KOHA_CLIENT_ID et API_KOHA_CLIENT_SECRET. Attention, pas de guillemets doubles autour des valeurs (contrairement à un .env habituel)
+Ex : 
+API_KOHA_CLIENT_ID=fake
+API_KOHA_CLIENT_SECRET=fake
+
 - ne pas oublier de rebuilder l'image (commande : docker build -t -f Dockerfile_https azurscd/koha-primo-middleware:latest .) 
 - pusher sur le dépôt Docker Hub [https://hub.docker.com/repository/docker/azurscd/koha-primo-middleware](https://hub.docker.com/repository/docker/azurscd/koha-primo-middleware)
-- déployer sur le serveur de production par un pull de Docker Hub
+- déployer sur le serveur de production par un pull de Docker Hub et lancer le conteneur
+- la commande docker run doit contenir les arguments suivants : sudo docker run --env-file ./secrets.env -d -it --name koha-primo-middleware -p 5000:5000 azurscd/koha-primo-middleware:latest
+
 
 ### A noter CI/CD via Github Action désactivé
 

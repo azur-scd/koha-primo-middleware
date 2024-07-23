@@ -3,11 +3,11 @@ FROM python:3.10-slim-bookworm
 RUN apt-get update \ 
     && apt-get install -y locales locales-all \
     && rm -rf /var/lib/apt/lists/*
-ENV LC_ALL fr_FR.UTF-8
-ENV LANG fr_FR.UTF-8
-ENV LANGUAGE fr_FR.UTF-8
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV LC_ALL=fr_FR.UTF-8
+ENV LANG=fr_FR.UTF-8
+ENV LANGUAGE=fr_FR.UTF-8
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 COPY requirements.txt requirements.txt
 RUN pip install --upgrade pip

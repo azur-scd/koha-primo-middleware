@@ -3,7 +3,8 @@ from flask_restful import Resource, reqparse
 from flask_restful_swagger_2 import Api, swagger, Schema
 from flask_json import FlaskJSON, json_response
 from flask_cors import CORS
-import pandas as pd
+import io
+#import pandas as pd
 import requests
 import json
 import datetime
@@ -37,10 +38,12 @@ host = env['APP_HOST']
 api_version = env['API_VERSION']
 api_version_dev = env['API_VERSION_DEV']
 url_subpath = env['URL_SUBPATH']
-demo_koha_api_public = env["DEMO_KOHA_API_PUBLIC"]
 prod_koha_api_public = env["PROD_KOHA_API_PUBLIC"]
 prod_koha_api_auth = env["PROD_KOHA_API_AUTH"]
 prod_koha_api_prive = env["PROD_KOHA_API_PRIVE"]
+
+os.environ.get('API_KOHA_CLIENT_ID','')
+os.environ.get('API_KOHA_CLIENT_SECRET','')
 
 mapping_codes_types_pret = mappings.MAPPING_CODES_TYPES_PRET
 mapping_bibs = mappings.MAPPING_BIBS

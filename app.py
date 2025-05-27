@@ -242,6 +242,11 @@ class KohaApiPubliqueBibliosItems(Resource):
 # est-ce qu'on appelle pas 2 fois l'api koha?        
         datas = flatten([request_on_koha_api(id) for id in valid_ids_list])    
         app.logger.info("API middleware appellée avec parametres {}".format (valid_ids_list))
+        
+        
+        app.logger.info(mapping_bibs)
+        
+        
         ordered_data = sorted(datas, key=lambda x: bibs_order[x.get('home_library_id')])
         new_data = [extract_koha_item(i) for i in ordered_data]
         resa_button = resa_button_rules(datas)

@@ -214,7 +214,7 @@ class HelloWorld(Resource):
 class Changelog(Resource):
     def get(self):
         # Default to 200 OK
-        return changelog
+        return jsonify({'msg': 'changelog'})
 
 # It takes a biblio_id as input, and returns a list of converted items associated with that biblio_id
 class InitKohaApiPubliqueBibliosItems(Resource):
@@ -226,7 +226,7 @@ class InitKohaApiPubliqueBibliosItems(Resource):
         data = json.loads(response)
         ordered_data = sorted(data, key=lambda x: bibs_order[x.get('home_library_id')])
         # Pour inverser : sorted(data, key=lambda x: bibs_order[x.get('home_library_id')], reverse=True)
-        new_data = [extract_koha_item(i) for i in ordered_data]       
+        new_data = [extract_koha_item(i) for i in ordered_data]
         return jsonify(new_data)
 
 # It takes a biblio_id as input, and returns a list of converted items associated with that biblio_id

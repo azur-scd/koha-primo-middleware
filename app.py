@@ -22,13 +22,6 @@ env = dotenv_values(".env")
 #logging.basicConfig(filename='record.log', level=logging.INFO)
 
 
-changelog_path = 'changelog.txt'
-if os.path.exists(changelog_path):
-    with open(changelog_path, 'r', encoding='utf-8') as file:
-        changelog = file.read()
-else:
-    changelog = ''
-
 app = Flask(__name__)
 if __name__ != '__main__':
    gunicorn_logger = logging.getLogger('gunicorn.error')
@@ -165,27 +158,45 @@ def extract_koha_item(item):
         checked_out_date = convert_to_french_date(item['checked_out_date'])
         result['availability'] = f'Indisponible : emprunté (Retour le {checked_out_date})'
     # Bibliothèque
-    result["home_library_id"] = mapping_bibs[item["home_library_id"]]
+    if (item["home_library_id"] is None):
+        result["BIB INCONNUE"]
+        app.logger.warn("ERREUR : Code bibliothèque vide")
+    elif (item["home_library_id"] not in mapping_bibs):
+        result["home_library_id"] = item["home_library_id"] 
+        app.logger.warn("ERREUR : Code bibliothèque introuvable dans le fichier de mapping : "+item["home_library_id"])
+    else:    
+        result["home_library_id"] = mapping_bibs[item["home_library_id"]]
     # Localisation
-    if item["location"] is not None:
+    if (item["location"] is None):
+        result["LOCALISATION INCONNUE"]
+        app.logger.warn("ERREUR : Code localisation vide")
+    elif (item["location"] not in mapping_locs):
+        result["location"] = item["location"]
+        app.logger.warn("ERREUR : Code localisation introuvable dans le fichier de mapping : "+item["location"])
+    else:    
         result["location"] = mapping_locs[item["location"]]
     # Cote
     if item["callnumber"] is not None:
         result["callnumber"] = item["callnumber"]
     # Type de prêt
-    if item["item_type_id"] is not None:
-        result["loan_type"] = mapping_codes_types_pret[item["item_type_id"]]
+    if (item["item_type_id"] is None):
+        result["TYPE DE PRET INCONNU"]
+        app.logger.warn("ERREUR : Type de prêt vide")
+    elif (item["item_type_id"] not in mapping_codes_types_pret):
+        result["item_type_id"] = item["item_type_id"]
+        app.logger.warn("ERREUR : Type de prêt introuvable dans le fichier de mapping : "+item["item_type_id"])
+    else:    
+        result["item_type_id"] = mapping_codes_types_pret[item["item_type_id"]]
     # si pério on affiche l' état de coll ; si monographie on affiche la description
     if (item["serial_issue_number"] is not None) & (item["not_for_loan_status"] == 2) :
-        result["serial_issue_number"] = f"Etat de collection : {item['serial_issue_number']}"        
+        result["serial_issue_number"] = f"Etat de collection : {item['serial_issue_number']}"
     elif item["serial_issue_number"] is not None:
-        result["serial_issue_number"] =  item["serial_issue_number"]        
+        result["serial_issue_number"] =  item["serial_issue_number"]
     return result
-
 def request_on_koha_api(biblio_id):
     if (biblio_id is None) or not (biblio_id.isnumeric ()): 
             app.logger.warn("API Koha biblios/biblio_id/items non appellée, parametre invalide")
-            return []       
+            return []
     app.logger.info("API Koha biblios/biblio_id/items appellée avec parametre {}".format (biblio_id))
     url = f"{prod_koha_api_public}biblios/{biblio_id}/items"
     response = requests.request("GET", url)
@@ -212,11 +223,6 @@ class HelloWorld(Resource):
         # Default to 200 OK
         return jsonify({'msg': 'Hello world'})
 
-class Changelog(Resource):
-    def get(self):
-        # Default to 200 OK
-        return jsonify({'msg': 'changelog'})
-
 # It takes a biblio_id as input, and returns a list of converted items associated with that biblio_id
 class InitKohaApiPubliqueBibliosItems(Resource):
     @swagger.doc({
@@ -225,6 +231,7 @@ class InitKohaApiPubliqueBibliosItems(Resource):
         url = f"{prod_koha_api_public}biblios/{biblio_id}/items"
         response = requests.request("GET", url).text
         data = json.loads(response)
+        app.logger.warn(response)
         ordered_data = sorted(data, key=lambda x: bibs_order[x.get('home_library_id')])
         # Pour inverser : sorted(data, key=lambda x: bibs_order[x.get('home_library_id')], reverse=True)
         new_data = [extract_koha_item(i) for i in ordered_data]
@@ -243,11 +250,6 @@ class KohaApiPubliqueBibliosItems(Resource):
 # est-ce qu'on appelle pas 2 fois l'api koha?        
         datas = flatten([request_on_koha_api(id) for id in valid_ids_list])    
         app.logger.info("API middleware appellée avec parametres {}".format (valid_ids_list))
-        
-        
-        app.logger.info(json.dumps(mapping_bibs))
-        
-        
         ordered_data = sorted(datas, key=lambda x: bibs_order[x.get('home_library_id')])
         new_data = [extract_koha_item(i) for i in ordered_data]
         resa_button = resa_button_rules(datas)
@@ -268,7 +270,6 @@ class DevKohaApiPubliqueBibliosItems(Resource):
         return jsonify(final_data)
 
 
-api.add_resource(Changelog, f'/api/{api_version}', f'/api/{api_version}/changelog')
 api.add_resource(HelloWorld, f'/api/{api_version}', f'/api/{api_version}/hello')
 #api.add_resource(InitKohaApiPubliqueBibliosItems, f'/api/{api_version}/koha/biblios_items/<string:biblio_id>')
 api.add_resource(KohaApiPubliqueBibliosItems, f'/api/{api_version}/koha/biblios_items')

@@ -51,8 +51,6 @@ prod_koha_api_prive = env["PROD_KOHA_API_PRIVE"]
 os.environ.get('API_KOHA_CLIENT_ID','')
 os.environ.get('API_KOHA_CLIENT_SECRET','')
 
-
-print (json.dumps(mappings))
 mapping_codes_types_pret = mappings.MAPPING_CODES_TYPES_PRET
 mapping_bibs = mappings.MAPPING_BIBS
 mapping_locs = mappings.MAPPING_LOCS

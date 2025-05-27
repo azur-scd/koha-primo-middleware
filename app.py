@@ -22,8 +22,14 @@ env = dotenv_values(".env")
 #logging.basicConfig(filename='record.log', level=logging.INFO)
 
 
-app = Flask(__name__)
+changelog_path = 'changelog.txt'
+if os.path.exists(changelog_path):
+    with open(changelog_path, 'r', encoding='utf-8') as file:
+        changelog = file.read()
+else:
+    changelog = ''
 
+app = Flask(__name__)
 if __name__ != '__main__':
    gunicorn_logger = logging.getLogger('gunicorn.error')
    app.logger.handlers = gunicorn_logger.handlers
@@ -204,7 +210,12 @@ class HelloWorld(Resource):
     def get(self):
         # Default to 200 OK
         return jsonify({'msg': 'Hello world'})
-    
+
+class Changelog(Resource):
+    def get(self):
+        # Default to 200 OK
+        return changelog
+
 # It takes a biblio_id as input, and returns a list of converted items associated with that biblio_id
 class InitKohaApiPubliqueBibliosItems(Resource):
     @swagger.doc({
@@ -251,7 +262,8 @@ class DevKohaApiPubliqueBibliosItems(Resource):
         return jsonify(final_data)
 
 
-api.add_resource(HelloWorld, f'/api/{api_version}', f'/api/{api_version}/hello')      
+api.add_resource(Changelog, f'/api/{api_version}', f'/api/{api_version}/changelog')
+api.add_resource(HelloWorld, f'/api/{api_version}', f'/api/{api_version}/hello')
 #api.add_resource(InitKohaApiPubliqueBibliosItems, f'/api/{api_version}/koha/biblios_items/<string:biblio_id>')
 api.add_resource(KohaApiPubliqueBibliosItems, f'/api/{api_version}/koha/biblios_items')
 #api.add_resource(DevKohaApiPubliqueBibliosItems, f'/api/{api_version_dev}/koha/biblios_items')

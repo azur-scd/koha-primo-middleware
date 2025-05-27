@@ -51,9 +51,12 @@ prod_koha_api_prive = env["PROD_KOHA_API_PRIVE"]
 os.environ.get('API_KOHA_CLIENT_ID','')
 os.environ.get('API_KOHA_CLIENT_SECRET','')
 
+
+print (json.dumps(mappings))
 mapping_codes_types_pret = mappings.MAPPING_CODES_TYPES_PRET
 mapping_bibs = mappings.MAPPING_BIBS
 mapping_locs = mappings.MAPPING_LOCS
+
 bibs_order = config.BIBS_ORDER
 bibs_order_by_label = config.BIBS_ORDER_BY_LABEL
 resanavette_bibs_true = config.RESANAVETTE_BIBS_TRUE
@@ -244,7 +247,7 @@ class KohaApiPubliqueBibliosItems(Resource):
         app.logger.info("API middleware appellée avec parametres {}".format (valid_ids_list))
         
         
-        app.logger.info(mapping_bibs)
+        app.logger.info(json.dumps(mapping_bibs))
         
         
         ordered_data = sorted(datas, key=lambda x: bibs_order[x.get('home_library_id')])

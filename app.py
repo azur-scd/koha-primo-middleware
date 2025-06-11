@@ -252,7 +252,7 @@ class KohaApiPubliqueBibliosItems(Resource):
         app.logger.info("API middleware appellée avec parametres {}".format (valid_ids_list))
         ordered_data = sorted(datas, key=lambda x: bibs_order[x.get('home_library_id')])
         new_data = [extract_koha_item(i) for i in ordered_data]
-        resa_button = resa_button_rules(datas)w
+        resa_button = resa_button_rules(datas)
         final_data = {"resa_button": resa_button, "items": new_data}
         return jsonify(final_data)
     

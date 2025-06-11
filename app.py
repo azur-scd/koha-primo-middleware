@@ -183,10 +183,10 @@ def extract_koha_item(item):
         result["TYPE DE PRET INCONNU"]
         app.logger.warn("ERREUR : Type de prêt vide")
     elif (item["item_type_id"] not in mapping_codes_types_pret):
-        result["item_type_id"] = item["item_type_id"]
+        result["loan_type"] = item["item_type_id"]
         app.logger.warn("ERREUR : Type de prêt introuvable dans le fichier de mapping : "+item["item_type_id"])
     else:    
-        result["item_type_id"] = mapping_codes_types_pret[item["item_type_id"]]
+        result["loan_type"] = mapping_codes_types_pret[item["item_type_id"]]
     # si pério on affiche l' état de coll ; si monographie on affiche la description
     if (item["serial_issue_number"] is not None) & (item["not_for_loan_status"] == 2) :
         result["serial_issue_number"] = f"Etat de collection : {item['serial_issue_number']}"
@@ -252,7 +252,7 @@ class KohaApiPubliqueBibliosItems(Resource):
         app.logger.info("API middleware appellée avec parametres {}".format (valid_ids_list))
         ordered_data = sorted(datas, key=lambda x: bibs_order[x.get('home_library_id')])
         new_data = [extract_koha_item(i) for i in ordered_data]
-        resa_button = resa_button_rules(datas)
+        resa_button = resa_button_rules(datas)w
         final_data = {"resa_button": resa_button, "items": new_data}
         return jsonify(final_data)
     

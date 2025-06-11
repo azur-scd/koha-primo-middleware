@@ -1,5 +1,6 @@
-2024-05-27 : ajout de bib GEORGEV et LIEGEARD et de localisations VITRINE, LUDO, SONORE, JEUNESSE
-2024-05-17 : ajout de localisation MAGASE
+2025-06-11 : correction : propriété loan_type rétablie
+2025-05-27 : ajout de bib GEORGEV et LIEGEARD et de localisations VITRINE, LUDO, SONORE, JEUNESSE
+2025-05-17 : ajout de localisation MAGASE
 2024-07-23 : image réduite, meilleure sécurité, clés Koha importées depuis fichier sur serveur hôte, ajout de localisations BGG et DET3
 2024-07-12 : meilleure gestion des erreurs et journalisation
 2024-07-10 : mise à jour des dépendances, ajout de la localisation CONC (BU Droit), du type de prêt JEU, de la bib BIBEL

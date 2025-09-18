@@ -48,6 +48,6 @@ BIBS_ORDER_BY_LABEL = {"BU Lettres Arts Sciences Humaines": 1,
 ##################################################################
 ## TODO : activer la navette pour 'GEORGEV', 'LIEGEARD',
 ## TODO : activer la navette pour les jeux
-RESANAVETTE_BIBS_TRUE = ['SCIEN','MEDP','LASH', 'DROIT','SJA', 'STAPS', 'LCSOPHIA', 'BIUTF']
+RESANAVETTE_BIBS_TRUE = ['SCIEN','MEDP','LASH', 'DROIT','SJA', 'STAPS', 'LCSOPHIA', 'BIUTF', 'GEORGEV', 'LIEGEARD']
 RESA_BIBS_TRUE = ['LJAD', 'BIUTC', 'BIUTM']
 RESA_CODES_PRET_TRUE = ['NOR', 'COU']

@@ -3,6 +3,7 @@
 
 ## 17/05/2025 : ajout de la localisation MAGASE
 ## 27/05/2025 : ajout des bibliothèques (GEORGEV et LIEGEARD) et localisations (JEUNESSE, LUDO, SONORE, VITRINE) de l'INSPE de Nice
+## 27/11/2025 : ajout du type de prêt "Jeu pédagogique"
 
 MAPPING_CODES_TYPES_PRET = {'NOR': 'Prêt normal',
                             'COU': 'Prêt court',
@@ -13,7 +14,8 @@ MAPPING_CODES_TYPES_PRET = {'NOR': 'Prêt normal',
                             'PCLONG': 'PC prêt long',
                             'PCPRO': 'PC prêt professionnel',
                             'EL': 'En ligne',
-                            'JEU' : 'Jeu de société'}
+                            'JEU' : 'Jeu de société',
+                            'JEUPEDA' : 'Jeu pédagogique'}
 MAPPING_BIBS = {"LASH": "BU Lettres Arts Sciences Humaines",
                 "DROIT": "BU Droit et Science politique",
                 "SJA": "BU Saint-Jean d’Angély",

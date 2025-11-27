@@ -46,7 +46,6 @@ BIBS_ORDER_BY_LABEL = {"BU Lettres Arts Sciences Humaines": 1,
 
 ####### RULES FOR DISPLAYING RESERVATION BUTTON ###################
 ##################################################################
-## TODO : activer la navette pour 'GEORGEV', 'LIEGEARD',
 ## TODO : activer la navette pour les jeux
 RESANAVETTE_BIBS_TRUE = ['SCIEN','MEDP','LASH', 'DROIT','SJA', 'STAPS', 'LCSOPHIA', 'BIUTF', 'GEORGEV', 'LIEGEARD']
 RESA_BIBS_TRUE = ['LJAD', 'BIUTC', 'BIUTM']

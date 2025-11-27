@@ -123,28 +123,57 @@ def resa_button_rules(items):
 def extract_koha_item(item):
     # TODO vérifier le fonctionnement de checked out date
     # TODO revoir la détection des périodiques (ne plus s'appuyer sur HDL dans le code barre)
-    # Exemple de réponse de la route publique de l'API Koha biblios/{biblio_id}/items (version 21.11 ; à vérifier en 23.11)
+    # Exemple de réponse de la route publique de l'API Koha biblios/{biblio_id}/items (Koha 24.11)
     # [{"acquisition_date":"2009-11-04",
+    # "acquisition_source": null,
     # "biblio_id":402754,               => biblionumber. Utilisé
+    # "bookable": false,
+    # "call_number_sort": "330_155000000000000_6_SEN",
+    # "call_number_source": null,
     # "callnumber":"330.155 6 SEN",     => cote. Utilisé
     # "checked_out_date":null,          => date de prêt. Utilisé
+    # "checkouts_count": 5,
+    # "coded_location_qualifier": null,
+    # "collection_code": "L",           => Nouveau! A UTILISER
     # "copy_number":null,
+    # "damaged_date": null,
     # "damaged_status":0,
+    # "effective_bookable": false,
     # "effective_item_type_id":"NOR",
     # "effective_not_for_loan_status":0,
+    # "exclude_from_local_holds_priority": false,
+    # "extended_subfields": "\u003C?xml version=\"1.0\" encoding=\"UTF-8\"?\u003E\n\u003Ccollection\n  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n  xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"\n  xmlns=\"http://www.loc.gov/MARC21/slim\"\u003E\n\n\u003Crecord\u003E\n  \u003Cleader\u003E         a              \u003C/leader\u003E\n  \u003Cdatafield tag=\"999\" ind1=\" \" ind2=\" \"\u003E\n    \u003Csubfield code=\"P\"\u003Eachat\u003C/subfield\u003E\n  \u003C/datafield\u003E\n\u003C/record\u003E\n\n\u003C/collection\u003E",
     # "external_id":"0962065252",        => code-barre. Utilisé
     # "holding_library_id":"SJA",        => bibliothèque effective (<> bibliothèque d'appartenance en cas de transfert). Utilisé
+    # "holds_count": null,
     # "home_library_id":"SJA",           => bibliothèque d'appartenance. Utilisé
+    # "internal_notes": null,
+    # "inventory_number": "29589-12-A",
     # "item_id":731974,
     # "item_type_id":"NOR",              => type de prêt. Utilisé
+    # "last_checkout_date": "2018-09-11",
+    # "last_seen_date": "2025-07-07T00:00:00+02:00",
+    # "localuse": null,
     # "location":"ECO",                  => localisation. Utilisé
+    # "lost_date": null,
     # "lost_status":0,
-    # "not_for_loan_status":0,           => statut exclu du prêt. Utilisé pour repérer les états de collection
+    # "materials_notes": null,
+    # "new_status": null,
+    # "not_for_loan_status":0,           => statut exclu du prêt. Utilisé pour repérer les états de collection. A REVOIR?
+    # "permanent_location": "ECO",
     # "public_notes":null,
+    # "purchase_price": null,
+    # "renewals_count": null,
+    # "replacement_price": null,
+    # "replacement_price_date": "2023-02-21",
     # "restricted_status":null,
     # "serial_issue_number":null,        => description. Utilisé
+    # "shelving_control_number": null,
+    # "timestamp": "2025-07-11T09:02:59+02:00",    
     # "uri":null,
+    # "withdrawn_date": null
     # "withdrawn":0}]
+    
     result = {'biblio_id': item['biblio_id']}
     # s'il n'y a pas de date de retour et si le doc n'est pas en transfert -> disponible
     if (item['checked_out_date'] is None) & (item["holding_library_id"] == item["home_library_id"]):

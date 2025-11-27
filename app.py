@@ -188,7 +188,7 @@ def extract_koha_item(item):
         result['availability'] = f'Indisponible : emprunté (Retour le {checked_out_date})'
     # Bibliothèque
     if (item["home_library_id"] is None):
-        result["BIB INCONNUE"]
+        result["home_library_id"] = "BIB INCONNUE"
         app.logger.warn("ERREUR : Code bibliothèque vide")
     elif (item["home_library_id"] not in mapping_bibs):
         result["home_library_id"] = item["home_library_id"] 
@@ -197,7 +197,7 @@ def extract_koha_item(item):
         result["home_library_id"] = mapping_bibs[item["home_library_id"]]
     # Localisation
     if (item["location"] is None):
-        result["LOCALISATION INCONNUE"]
+        result["location"]  = "LOCALISATION INCONNUE"
         app.logger.warn("ERREUR : Code localisation vide")
     elif (item["location"] not in mapping_locs):
         result["location"] = item["location"]
@@ -209,7 +209,7 @@ def extract_koha_item(item):
         result["callnumber"] = item["callnumber"]
     # Type de prêt
     if (item["item_type_id"] is None):
-        result["TYPE DE PRET INCONNU"]
+        result["loan_type"] = "TYPE DE PRET INCONNU"
         app.logger.warn("ERREUR : Type de prêt vide")
     elif (item["item_type_id"] not in mapping_codes_types_pret):
         result["loan_type"] = item["item_type_id"]

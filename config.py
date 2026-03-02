@@ -1,5 +1,7 @@
 ####### BIBS ORDERED FOR DISPLAYING KOHA ITEMS ###################
 ##################################################################
+## 02/03/2026 : ajout de la bibliothèque Draguignan et modification des noms des bibliothèques
+
 
 BIBS_ORDER = {'LASH': 1,
                 'DROIT': 2,
@@ -10,17 +12,18 @@ BIBS_ORDER = {'LASH': 1,
                 'LCSOPHIA': 7,
                 'GEORGEV': 8,
                 'LIEGEARD': 9,
-                'BIUTF': 10,
-                'BIUTM': 11,
-                'BIUTC': 12,
-                'VA': 13,
-                'OCANI': 14,
-                'OCAVV': 15,
-                'OCASA': 16,
-                'JAD': 17,
-                'LIRCE': 18,
-                'CMMC': 19,
-                'BCL': 20
+                'DRAGUIGNAN': 10,
+                'BIUTF': 11,
+                'BIUTM': 12,
+                'BIUTC': 13,
+                'VA': 14,
+                'OCANI': 15,
+                'OCAVV': 16,
+                'OCASA': 17,
+                'JAD': 18,
+                'LIRCE': 19,
+                'CMMC': 20,
+                'BCL': 21
                 }
 BIBS_ORDER_BY_LABEL = {"BU Carlone": 1,
                 "BU Trotabas": 2,
@@ -29,19 +32,20 @@ BIBS_ORDER_BY_LABEL = {"BU Carlone": 1,
                 "BU Pasteur": 5,
                 "BU STAPS": 6,
                 "Learning Center SophiaTech": 7,
-                "BU George V": 8,
-                "BU Liégeard ": 9,
-                "Bibliothèque de l’IUT Fabron": 10,
-                "Bibliothèque de l’IUT de Menton": 11,
-                "Bibliothèque de l’IUT de Cannes": 12,
-                "Bibliothèque de la Villa Arson": 13,
-                "OCANI": 14,
-                "OCAVV": 15,
-                "OCASA": 16,
-                "JAD": 17,
-                "LIRCE": 18,
-                "CMMC": 19,
-                "BCL": 20
+                "BU INSPE George V": 8,
+                "BU INSPE Liégeard ": 9,
+                "BU INSPE Draguignan ": 10,
+                "Bibliothèque de l’IUT Fabron": 11,
+                "Bibliothèque de l’IUT de Menton": 12,
+                "Bibliothèque de l’IUT de Cannes": 13,
+                "Bibliothèque de la Villa Arson": 14,
+                "OCANI": 15,
+                "OCAVV": 16,
+                "OCASA": 17,
+                "JAD": 18,
+                "LIRCE": 19,
+                "CMMC": 20,
+                "BCL": 21
                 }
 
 ####### RULES FOR DISPLAYING RESERVATION BUTTON ###################

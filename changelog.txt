@@ -1,3 +1,9 @@
+2026-04-29 : ajout des localisations RESERVE et PEDAGOGIE ; mises à jour de dépendances
+2026-03-02 : renommage des BU, ajout de DRAGUIGNAN ; mise à jour de dépendances
+2025-02-22 : mise à jour de dépendances
+2025-11-27 : corrige la gestion des valeurs manquantes ; documentation résultats API en 24.11 ; ajout du type de prêt JEU PEDAGOGIQUE
+2025-09-18 : navette ouverte pour les INSPE
+2025-06-19 : mise à jour de dépendances
 2025-06-11 : correction : propriété loan_type rétablie
 2025-05-27 : ajout de bib GEORGEV et LIEGEARD et de localisations VITRINE, LUDO, SONORE, JEUNESSE
 2025-05-17 : ajout de localisation MAGASE

@@ -1,6 +1,7 @@
 ####### BIBS ORDERED FOR DISPLAYING KOHA ITEMS ###################
 ##################################################################
 ## 02/03/2026 : ajout de la bibliothèque Draguignan et modification des noms des bibliothèques
+## 12/10/2026 : réservations sans navette pour Draguignan
 
 
 BIBS_ORDER = {'LASH': 1,
@@ -52,5 +53,5 @@ BIBS_ORDER_BY_LABEL = {"BU Carlone": 1,
 ##################################################################
 ## TODO : activer la navette pour les jeux
 RESANAVETTE_BIBS_TRUE = ['SCIEN','MEDP','LASH', 'DROIT','SJA', 'STAPS', 'LCSOPHIA', 'BIUTF', 'GEORGEV', 'LIEGEARD']
-RESA_BIBS_TRUE = ['LJAD', 'BIUTC', 'BIUTM']
+RESA_BIBS_TRUE = ['LJAD', 'BIUTC', 'BIUTM', 'DRAGUIGNAN']
 RESA_CODES_PRET_TRUE = ['NOR', 'COU']
